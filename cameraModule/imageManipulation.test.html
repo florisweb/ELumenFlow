@@ -152,10 +152,8 @@
 
 			let out = validMarkers.map(r => [
 				Math.round(r.map(i => i[0]).reduce((a, b) => a + b, 0) / r.length),
-				Math.round(r.map(i => i[1]).reduce((a, b) => a + b, 0) / r.length),
-				r 
+				Math.round(r.map(i => i[1]).reduce((a, b) => a + b, 0) / r.length)
 			]);
-			console.log(validMarkers);
 			
 
 			let centre = [
@@ -202,7 +200,8 @@
 				let y = Math.floor(i / channels / _width);
 				let x = i / channels - y * _width;
 
-				if (!isPointInQuadrilateral([x, y], _markers[0], _markers[1], _markers[3], _markers[2]))
+				// if (!isPointInQuadrilateral([x, y], _markers[0], _markers[1], _markers[3], _markers[2]))
+				if (!isPointInQuadrilateral([x, y], _markers[3], _markers[2], _markers[1], _markers[0]))
 				{
 					// outData[i + 0] = 0;
 					// outData[i + 1] = 0;
@@ -215,16 +214,6 @@
 		}
 
 		function mapAreaToRectangle(_data, _width, _markers) {
-			// let outSize = [
-			// 	Math.ceil(Math.max(
-			// 		len(add(_markers[1], scale(_markers[0], -1))), 
-			// 		len(add(_markers[3], scale(_markers[2], -1)))
-			// 	)),
-			// 	Math.ceil(Math.max(
-			// 		len(add(_markers[2], scale(_markers[0], -1))), 
-			// 		len(add(_markers[3], scale(_markers[1], -1)))
-			// 	))
-			// ];
 			let outSize = [
 				Math.ceil(Math.max(
 					len(add(_markers[1], scale(_markers[0], -1))), 
@@ -236,68 +225,17 @@
 				))
 			];
 			let cameraPoints = [
-				[0, 0],
-				[outSize[0], 0],
-				[outSize[0], outSize[1]],
 				[0, outSize[1]],
+				[outSize[0], outSize[1]],
+				[outSize[0], 0],
+				[0, 0],
 			];
 
 			let worldPoints = _markers;
-
-			let coordToWorldCoord = generateMapFunction(cameraPoints, worldPoints); // Maps a camera point to the world.
-			console.log(window.m = coordToWorldCoord);
-
-			// let outSize = [
-			// 	Math.max(_markers[1][0] - _markers[0][0], _markers[3][0] - _markers[2][0]),
-			// 	Math.max(_markers[2][1] - _markers[0][1], _markers[3][1] - _markers[1][1])
-			// ];
-			// outSize = [_width, Math.floor(_data.length / _width / channels)]
+			let coordToWorldCoord = generateMapFunction(worldPoints, cameraPoints); // Maps a camera point to the world.
+			window.m = coordToWorldCoord
 			
 
-			/*
-				Dia 1 (to bottom right) is defined as starting in the top left: origin,
-				Dia 2 (to top right) is defined as stargin in the bottom left, with an offset from the origin.
-			*/
-
-			// let outLen = len(outSize);
-			// let outDia1Vec = [outLen, outLen]; // Is a rectangle, so both diagonals are always the same length
-			// let outDia2Vec = [outLen, -outLen];
-			// let outDia2Offset = [0, 0]; //[0, outSize[1]];
-
-
-			// console.log('outSize', outSize);
-			
-
-			// let dia1Vec = [
-			// 	(_markers[3][0] - _markers[0][0]),
-			// 	(_markers[3][1] - _markers[0][1]),
-			// ];
-			// let dia2Vec = [
-			// 	(_markers[1][0] - _markers[2][0]),
-			// 	(_markers[1][1] - _markers[2][1]),
-			// ];
-			// let dia2Offset = [0,0]; //add(_markers[2], scale(_markers[0], -1));
-
-
-			// let dia1VecInv = scale([
-			// 	dia2Vec[1],
-			// 	-dia1Vec[0]
-			// ], 1 / (dia1Vec[0] * dia2Vec[1] - dia1Vec[1] * dia2Vec[0]));
-			// let dia2VecInv = scale([
-			// 	-dia2Vec[0],
-			// 	dia1Vec[1]
-			// ], 1 / (dia1Vec[0] * dia2Vec[1] - dia1Vec[1] * dia2Vec[0]))
-
-			// let dia1VecInv = scale([
-			// 	dia2Vec[1],
-			// 	-dia1Vec[1]
-			// ], 1 / (dia1Vec[0] * dia2Vec[1] - dia1Vec[1] * dia2Vec[0]));
-			// let dia2VecInv = scale([
-			// 	-dia2Vec[0],
-			// 	dia1Vec[0]
-			// ], 1 / (dia1Vec[0] * dia2Vec[1] - dia1Vec[1] * dia2Vec[0]))
-
-			
 
 			let dataOut = [];
 			for (let x = 0; x < outSize[0]; x++)
@@ -309,136 +247,13 @@
 			}
 
 
-			// Forwards
-			// for (let i = 0; i < _data.length; i += channels)
-			// {
-			// 	let y = Math.floor(i / channels / _width);
-			// 	let x = i / channels - y * _width;
-			// 	let p = [x - _markers[0][0], y - _markers[0][1]]; // Put origin of xy system at the same as the x'y'-system.
-
-
-			// 	let p_ = [
-			// 		dot(p, unit(dia1Vec)) / dia1Len,
-			// 		dot(p, unit(dia2Vec)) / dia2Len
-			// 	]; // in the first diagonal coordinate system  (normalized)
-
-			// 	p_[0] *= outLen;
-			// 	p_[1] *= outLen;
-
-			// 	let pPost = [
-			// 		dot(p_, unit(dia1VecInv)),
-			// 		dot(p_, unit(dia2VecInv)),
-			// 	]; 
-			// 	// console.log(p, '->', p_, '->', pPost);
-
-
-			// 	// let dia1Coord = dot([x, y], unit(dia1Vec)) / dia1Len;
-			// 	// let dia1Pos = [
-			// 	// 	dia1Coord * outSize[0],
-			// 	// 	dia1Coord * outSize[1]
-			// 	// ];
-
-			// 	// let dia2Coord = (dot([x, y], unit(dia2Vec)) / dia2Len - 0.5);
-			// 	// let dia2Pos = [
-			// 	// 	dia2Coord * outSize[0],
-			// 	// 	-dia2Coord * outSize[1] - outSize[1],
-			// 	// ];
-				
-
-
-			// 	let newPos = [Math.round(pPost[0]), Math.round(pPost[1])];
-			// 	let offset = Math.abs(pPost[0] % 1) + Math.abs(pPost[1] % 1);
-			// 	// if (offset > 2) continue;
-
-			// 	let index = (newPos[0] + newPos[1] * outSize[0]) * channels;
-			// 	dataOut[index + 0] = _data[i + 0];
-			// 	dataOut[index + 1] = _data[i + 1];
-			// 	dataOut[index + 2] = _data[i + 2];
-			// 	dataOut[index + 3] = _data[i + 3];
-
-			// 	// let diaX = 
-			// }
-
-
-			// Backwards
-			// for (let i = 0; i < dataOut.length; i += channels)
-			// {
-			// 	let y = Math.floor(i / channels / outSize[0]);
-			// 	let x = i / channels - y * outSize[0];
-			// 	let p = [x, y];
-			// 	let pOffsetted = p; //add(p, scale(outDia2Offset, 1));
-
-			// 	// Transform to final system's normalized diagonal coord system
-			// 	// let p_ = [
-			// 	// 	dot(p, unit(outDia1Vec)) / len(outDia1Vec),
-			// 	// 	dot(pOffsetted, unit(outDia2Vec)) / len(outDia2Vec)
-			// 	// ];
-
-			// 	let p_ = [
-			// 		dot(p, unit(outDia1Vec)),
-			// 		dot(pOffsetted, unit(outDia2Vec)),
-			// 	];
-
-
-			// 	// Scale these coords to the first systems diagonal system (denormalized)
-			// 	// p_[0] *= dia1Len;
-			// 	// p_[1] *= dia2Len;
-
-			// 	// Transform these coords back to the original (data in) coord system
-			// 	let pPost = [
-			// 		dot(p_, unit(dia1VecInv)),
-			// 		dot(p_, unit(dia2VecInv)),
-			// 	];
-			// 	// pPost = add(pPost, scale(dia2Offset, 0));
-
-
-			// 	// Shift these within that coordinate system
-			// 	// pPost[0] += _markers[0][0];
-			// 	// pPost[1] += _markers[0][1];
-
-
-			// 	// let p_ = [
-			// 	// 	dot(p, unit(dia1Vec)) * dia1Len / outLen,
-			// 	// 	dot(p, unit(dia2Vec)) * dia2Len / outLen
-			// 	// ]; // in the first diagonal coordinate system  (normalized)
-
-				
-
-
-			// 	// console.log(p, '->', p_, '->', pPost);
-
-
-			// 	// let dia1Coord = dot([x, y], unit(dia1Vec)) / dia1Len;
-			// 	// let dia1Pos = [
-			// 	// 	dia1Coord * outSize[0],
-			// 	// 	dia1Coord * outSize[1]
-			// 	// ];
-
-			// 	// let dia2Coord = (dot([x, y], unit(dia2Vec)) / dia2Len - 0.5);
-			// 	// let dia2Pos = [
-			// 	// 	dia2Coord * outSize[0],
-			// 	// 	-dia2Coord * outSize[1] - outSize[1],
-			// 	// ];
-				
-
-			// 	let newPos = [Math.round(pPost[0]), Math.round(pPost[1])]; // Todo: pixel interprelator?
-			// 	let index = (newPos[0] + newPos[1] * _width) * channels;
-			// 	dataOut[i + 0] = _data[index + 0];
-			// 	dataOut[i + 1] = _data[index + 1];
-			// 	dataOut[i + 2] = _data[index + 2];
-			// 	dataOut[i + 3] = _data[index + 3];
-
-			// 	// let diaX = 
-			// }
-
-
  			for (let i = 0; i < dataOut.length; i += channels)
 			{
 				let y = Math.floor(i / channels / outSize[0]);
 				let x = i / channels - y * outSize[0];
 				let cameraPos = [x, y];
-
 				let worldPos = coordToWorldCoord(cameraPos);
+				// worldPos[0] -= 60;
 				// worldPos[0] += _markers[3][0];
 				// worldPos[1] += _markers[3][1];
 
@@ -632,21 +447,6 @@
 
 
 		function generateMapFunction(worldPoints, cameraPoints) {
-			// let worldPoints = [
-			// 	[0, 0],
-			// 	[2, 0],
-			// 	[2, 2],
-			// 	[0, 2]
-			// ];
-
-			// let cameraPoints = [
-			// 	[0, 0],
-			// 	[2, 0],
-			// 	[2, 1],
-			// 	[0, 1]
-			// ];
-
-			
 			// x = image plane
 			// X = world plane
 
@@ -677,15 +477,12 @@
 			];
 
 			return function mapToSpace(_coord) {
-				let coord = [[_coord[0]], [_coord[1]], [1]];
+				let translatedCoord = add(_coord, [0, 0]);
+				let coord = [[translatedCoord[0]], [translatedCoord[1]], [1]];
 				let out = matrixMultiply(A, matrixMultiply(coord, invertMatrix(matrixMultiply(C, coord))));
 				return [out[0][0], out[1][0]];			
 			}
 		}
-
-
-
-
 
 
 
